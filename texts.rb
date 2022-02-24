@@ -15,7 +15,7 @@ module Texts
         
     def self.initial_instructions
         <<~HEREDOC
-        #{"========= Bem vindo ao jogo MasterMind! ========= ".bold}
+        #{"============================================================== Bem vindo ao jogo MasterMind!  ==============================================================".bold}
 
         #{"COMO O JOGO FUNCIONA:".italic}
         Este é um jogo em que o objetivo é você (ou o computador) precisa adivinhar um código de 4 números, sendo que existem 6 números possíveis, sendo eles: #{colors(1)} #{colors(2)} #{colors(3)} #{colors(4)} #{colors(5)} #{colors(6)}
@@ -40,7 +40,7 @@ module Texts
             4. Caso o adivinhador vença, ele receberá +1 ponto. Do contrário o criador do código receberá 1 ponto.
             5. Você definirá a quantidade de pontos que é necessário um jogador atingir para o jogo terminar.
         
-        #{"================== Se divirta! ================== ".bold}
+        #{"==================================================================  Se divirta! ==================================================================".bold}
 
         HEREDOC
     end
@@ -62,8 +62,8 @@ module Texts
     end
 
     def self.feedback_dots(type)
-        types = {colored: "●",
-         white: "○"
+        types = {colored: "● ",
+         white: "○ "
         }
         return types[type]
     end

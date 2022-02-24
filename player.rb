@@ -15,12 +15,14 @@ module Player
         @player = {
         type: nil,
         score: 0,
-        attempt: 0
+        attempt: 0,
+        combination: Array.new(4)
         }
         @computer = {
         type: nil,
         score: 0,
-        attempt: 0
+        attempt: 0,
+        combination: Array.new(4)
         }
     end
 

@@ -10,14 +10,9 @@ class Game
         choose_sides
         create_combination(@player[:type])
         @player[:type] == 1 ? player_decision(@player) : player_decision(@computer)
-        until @player[:attempt] == 12 || @computer[:attempt] == 12 || feedback(@guess_combination)
-            puts "Combinação errada. Nova tentativa."
-            @player[:type] == 1 ? player_decision(@player) : player_decision(@computer)
-            if (@player[:attempt] == 12 || @computer[:attempt] == 12) && feedback(@guess_combination) == false
-                puts "Você perdeu!"
-                puts "A combinação correta era: #{Texts.player_combination(@new_combination)}"
-            end
-        end
+        @player[:type] == 1 ? process_attempts(@player) : process_attempts(@computer)
+
+        puts ""
         puts "Deseja jogar novamente?"
         puts "1 - SIM"
         puts "2 - NÃO"
@@ -25,6 +20,21 @@ class Game
         play_again(@@play_again)
     end
      
+
+    def process_attempts(player)
+        until player[:attempt] == 12 || feedback(player[:combination])
+            puts "Combinação errada. Nova tentativa.".bold
+            puts " "
+            @player[:type] == 1 ? player_decision(@player) : player_decision(@computer)
+            if player[:attempt] == 12 && feedback(player[:combination]) == false
+                puts " "
+                puts "=========================================="
+                puts "              Você perdeu!".bold
+                puts "A combinação correta era: #{Texts.player_combination(@new_combination)}"
+                puts "=========================================="
+            end
+        end
+    end
 
     def choose_sides
         create_players
@@ -58,24 +68,27 @@ class Game
     end
 
     def player_decision(player)
-        @guess_combination = Array.new()
         case player
-            when @player
-                puts "Escolha uma combinação de 4 números. Escreva cada número separado por um espaço."
-                @guess_combination = gets.chomp.split(' ').map(&:to_i)
-                until combination_valid?(@guess_combination)
-                    @guess_combination = gets.chomp.split(' ').map(&:to_i)
+        when @player
+            puts "Escolha uma combinação de 4 números. Escreva cada número separado por um espaço."
+            @player[:combination] = gets.chomp.split(' ').map(&:to_i)
+            until combination_valid?(@player[:combination])
+                @player[:combination] = gets.chomp.split(' ').map(&:to_i)
+            end
+            @player[:attempt]+=1
+            puts "Números escolhidos por você: #{Texts.player_combination(@player[:combination])}"
+            puts "Tentativa #{@player[:attempt]} de 12"
+        when @computer
+            @computer[:combination].each_index do |index|
+                if @computer[:combination][index] == @new_combination[index]
+                    @computer[:combination][index]
+                else
+                    @computer[:combination][index] = Random.rand(1..6)
                 end
-                @player[:attempt]+=1
-                puts "Números escolhidos por você: #{Texts.player_combination(@guess_combination)}"
-                puts "Tentativa #{@player[:attempt]} de 12"
-            when @computer
-                until @guess_combination.length == 4
-                    @guess_combination.push(Random.rand(1..6))
-                end
-                @computer[:attempt] +=1
-                puts "Números escolhidos pelo computador: #{Texts.player_combination(@guess_combination)}"
-                puts "Tentativa #{@computer[:attempt]} de 12"
+            end    
+            @computer[:attempt] +=1
+            puts "Números escolhidos pelo computador: #{Texts.player_combination(@computer[:combination])}"
+            puts "Tentativa #{@computer[:attempt]} de 12"
         end
         
     end
@@ -92,8 +105,12 @@ class Game
         end
     end
 
+
     def feedback(array)
-        @@correct_choices = 4 - (@new_combination - array).length
+        @@correct_choices = 0
+            array.each do |e|
+                @new_combination.include?(e) ? @@correct_choices +=1 : next
+            end
         @@colored_dots = 0
         @@white_dots = 0
         array.length.times do |e|
@@ -103,10 +120,13 @@ class Game
         end
         @@white_dots = @@correct_choices - @@colored_dots 
         if @@colored_dots == 4 
-            puts "Parabens, você ganhou!"
+            puts " "
+            puts "======================"
+            puts "Parabens, você ganhou!".bold
+            puts "======================"
             return true
         else
-            puts "FEEDBACK:"
+            print "FEEDBACK: "
             @@white_dots.times do 
                 print Texts.feedback_dots(:white)
             end
@@ -117,9 +137,9 @@ class Game
             return false
         end
     end
-
+    
     def play_again(type)
-    type == 1 ? Game.new : puts("Obrigado por jogar!")
+        type == 1 ? Game.new : puts("Obrigado por jogar!")
     end
 
 end
